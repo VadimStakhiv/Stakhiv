@@ -1,0 +1,157 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode} 
+
+%---enable russian----
+
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+
+% PROBABILITY SYMBOLS
+\newcommand*\PROB\Pr 
+\DeclareMathOperator*{\EXPECT}{\mathbb{E}}
+
+
+% Sets, Rngs, ets 
+\newcommand{\N}{{{\mathbb N}}}
+\newcommand{\Z}{{{\mathbb Z}}}
+\newcommand{\R}{{{\mathbb R}}}
+\newcommand{\Zp}{\ints_p} % Integers modulo p
+\newcommand{\Zq}{\ints_q} % Integers modulo q
+\newcommand{\Zn}{\ints_N} % Integers modulo N
+
+% Landau 
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand*{\OLandau}{\bigO}
+\newcommand*{\WLandau}{\Omega}
+\newcommand*{\xOLandau}{\widetilde{\OLandau}}
+\newcommand*{\xWLandau}{\widetilde{\WLandau}}
+\newcommand*{\TLandau}{\Theta}
+\newcommand*{\xTLandau}{\widetilde{\TLandau}}
+\newcommand{\smallo}{o} %technically, an omicron
+\newcommand{\softO}{\widetilde{\bigO}}
+\newcommand{\wLandau}{\omega}
+\newcommand{\negl}{\mathrm{negl}} 
+
+% Misc
+\newcommand{\eps}{\varepsilon}
+\newcommand{\inprod}[1]{\left\langle #1 \right\rangle}
+
+
+\newcommand{\handout}[5]{
+	\noindent
+	\begin{center}
+		\framebox{
+			\vbox{
+				\hbox to 5.78in { {\bf Научно-исследовательская практика} \hfill #2 }
+				\vspace{4mm}
+				\hbox to 5.78in { {\Large \hfill #5  \hfill} }
+				\vspace{2mm}
+				\hbox to 5.78in { {\em #3 \hfill #4} }
+			}
+		}
+	\end{center}
+	\vspace*{4mm}
+}
+
+\newcommand{\lecture}[4]{\handout{#1}{#2}{#3}{Scribe: #4}{Решение сравнений второй степени #1}}
+
+\newtheorem{theorem}{Теорема}
+\newtheorem{lemma}{Лемма}
+\newtheorem{definition}{Определение}
+\newtheorem{corollary}{Следствие}
+\newtheorem{fact}{Факт}
+
+% 1-inch margins
+\topmargin 0pt
+\advance \topmargin by -\headheight
+\advance \topmargin by -\headsep
+\textheight 8.9in
+\oddsidemargin 0pt
+\evensidemargin \oddsidemargin
+\marginparwidth 0.5in
+\textwidth 6.5in
+
+\parindent 0in
+\parskip 1.5ex
+
+\begin{document}
+	
+	\lecture{}{Лето 2020}{}{Стахив Вадим}
+	
+	\section{Теория}
+	Рассмотрим произвольное сравнение второй степени:	
+	$ax^2+bx+c \equiv 0(mod p)$, где $a!\equiv 0(mod p)$
+	т.к.$4a!\equiv 0(mod p)$, то умножая сравнение на $4a$, получаем эквивалентное сравнение:\\
+	$4a^2x^2+4abx+4ac\equiv 0(mod p) \Leftrightarrow (2ax+b)^2\equiv b^2-4ac(mod p)$\\
+	Оно сводится к сравнению вида:
+	$y^2\equiv D(modp)$, где $D=b^2-4ac$ и $y=2ax+b$\\
+	Отметим, что т.к. $2a$ и $p$ взаимно просты, то между $x$ и $y$ существует взаимно однозначное соответствие.\\
+	Раз $D=b^2-4ac$, то сравнение имеет единственное решение при $D\equiv 0(mod p)$, имеет два решения, если $D$ квадратичный вычет по модулю p и не имеет решений, если $D$ квадратичный невычет по модулю $p$.
+	
+	\section{Алгоритм}
+	Для решения сравнений второй степени необходимо решить следующее сравнение:\\
+	$y^2\equiv D(modp)$, к которому сводится изначальное сраванение.\\
+	Для решения этого сравнения я использую алгоритм Тонелли — Шенкса.
+	\newpage
+	\begin{algorithm}[ph]
+		\caption{Алгоритм Тонелли — Шенкса}
+		\label{alg:AlgName}
+		\textbf{Входные данные:} $p$ - нечётное простое число, $a$ - целое число, являющееся квадратичным вычетом по модулю $p$\\
+		\textbf{Выходные данные:} Вычет $R$, удовлетворяющий сравнению $R^2\equiv n(modp)$
+		\begin{algorithmic}
+			\State 1. Вычислить $a^{(p-1)/2}(modp)$. Результат должен быть равен 1 или -1 по малой теореме Ферма.
+			\State 2. Если $a^{(p-1)/2}(modp) \equiv -1$ корней нет. Выход из алгоритма.
+			\State 3. Если $a^{(p-1)/2}(modp) \equiv 1$ представить: $p-1=s*2^e$,где $s$ и $e$ положительны.
+			\State 4. Найти число $n$, которое будет являться квадратным невычетом по модулю $p$
+			\State 5. \textit{(Инициализация)}.\\ 
+			\ \ \ $x\equiv a^{(s+1)/2}(modp)$ (Первое предположение о корне)\\
+			\ \ \ $b\equiv a^s(modp)$ (Первое предположение о погрешности)\\
+			\ \ \ $g\equiv n^s(modp)$ (Степень $g$ будет обновлять $x$ и $b$)\\
+		    \ \ \ $r\equiv e(modp)$ ($e$ будет расти с каждым шагом алгоритма)
+			\State 6. Имеем: $b^{2^{r-1}}=a^{s*2^{r-1}}=a^{(p-1)/2}\equiv 1(modp)$. Тогда существует такое наименьшее целое число $m$, что $0\le m\le r-1$ и $b^{2^m}\equiv1(modp)$
+			\ \ \ Найти $m$ путем последовательных возведений в квадрат и сокращений по модулю $p$. Таким образом найдётся m такой, что $ord_p(b)=2^m$.
+			\State 7. Если $m=0$, Вывести x.
+			\State 8. Если $m>0$ изменяются следующие переменные: \\
+			\ \ \ $x\equiv x*g^{2^{r-m-1}}(modp)$ \\
+			\ \ \ $b\equiv b*g^{2^{r-m}}(modp)$ \\
+			\ \ \ $g\equiv g^{2^{r-m}}(modp)$ \\
+			\ \ \ $r\equiv m(modp)$
+			\State 9. Вернитесь к шагу 6 с новыми значениями.
+		\end{algorithmic}
+	\end{algorithm}
+	После нахождения решения сравнения $R$ второе решение сравнения находится как $p-R$. В самом начале я рассматриваю некоторые дополнительные тривиальные случаи для увеличения скорости алгоритма.
+	\section{Машина}
+	Компьютер, на котором проходили тестирования, имеет следующие основные характеристики:
+	\begin{itemize}
+		\item Процессор: \textbf{Intel(R) Core(TM) i7-7700HQ CPU @ 2.80 GHz}
+			\item Видеоадаптер: \textbf{NVIDIA GeForce GTX 1050}
+			\item Оперативная память: \textbf{16GB}
+		\end{itemize}
+		\section{Анализ}
+		
+		\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{3.5cm}|p{3.5cm}|}
+			\hline
+			p & a & b & c & Время выполнения моего алгоритма & Время выполнения алгоритма Sage\\
+			\hline
+			$\approx 10^{100}$ &$\approx9^{78}$ &$\approx8^{67}$ & $\approx7^{32}$ & 2.81s & 0.39s\\
+			$\approx10^{200}$ &$\approx9^{178}$ &$\approx8^{167}$ & $\approx7^{139}$ & 5.48s & 2.63s\\
+			$\approx10^{300}$ & $\approx9^{200}$&$\approx8^{100}$ & $\approx7^{64}$ & 9.66s & 12.39s\\
+			$\approx10^{400}$ &$\approx9^{378}$ &$\approx8^{267}$ & $\approx7^{239}$ & 15.32s & 32.9s\\
+		    $\approx10^{450}$&$\approx9^{402}$ &$\approx8^{355}$ & $\approx7^{301}$ & 27.5s & 47.2s\\
+			\hline
+		\end{tabular}
+		
+		Тесты я проводил в онлайн компеляторе CoCalc. Исходя из результатов тестирования можно сделать вывод, что алгоритм sage для решения сравнений второй степени работает быстрее при небольших значениях коэффициентов и кольца, однако, он уступает моему алгоритму при достаточно больших числах.
+		
+		\paragraph{Bibliography.}
+		\begin{itemize}
+			\item Львовский С.М. - Набор и верстка в системе LATEX. 5-е изд. 2014.
+			\item Wikipedia: Wikipedia, The Free Encyclopedia [online], http://www.wikipedia.org
+			\item Square Roots from 1; 24, 51, 10 to Dan Shanks by Ezra Brown
+			\item Zimmermann P., Casamayou A., Cohen N. et al. - Computational Mathematics with SageMath. 2018
+			\item А.А.Илларионов - Теория чисел: Учебное пособие, 2016. 
+		\end{itemize}
+		
+	\end{document}
