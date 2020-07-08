@@ -82,42 +82,42 @@
 	
 	\section{Теория}
 	Рассмотрим произвольное сравнение второй степени:	
-	$ax^2+bx+c \equiv 0(mod p)$, где $a!\equiv 0(mod p)$
-	т.к.$4a!\equiv 0(mod p)$, то умножая сравнение на $4a$, получаем эквивалентное сравнение:\\
-	$4a^2x^2+4abx+4ac\equiv 0(mod p) \Leftrightarrow (2ax+b)^2\equiv b^2-4ac(mod p)$\\
+	$ax^2+bx+c \equiv 0\bmod p$, где $a!\equiv 0~\bmod p$
+	т.к.$4a!\equiv 0\bmod p$, то умножая сравнение на $4a$, получаем эквивалентное сравнение:\\
+	$4a^2x^2+4abx+4ac\equiv 0\bmod p \Leftrightarrow (2ax+b)^2\equiv b^2-4ac\bmod p$\\
 	Оно сводится к сравнению вида:
-	$y^2\equiv D(modp)$, где $D=b^2-4ac$ и $y=2ax+b$\\
+	$y^2\equiv D\bmod p$, где $D=b^2-4ac$ и $y=2ax+b$\\
 	Отметим, что т.к. $2a$ и $p$ взаимно просты, то между $x$ и $y$ существует взаимно однозначное соответствие.\\
-	Раз $D=b^2-4ac$, то сравнение имеет единственное решение при $D\equiv 0(mod p)$, имеет два решения, если $D$ квадратичный вычет по модулю p и не имеет решений, если $D$ квадратичный невычет по модулю $p$.
+	Раз $D=b^2-4ac$, то сравнение имеет единственное решение при $D\equiv 0\bmod p$, имеет два решения, если $D$ квадратичный вычет по модулю p и не имеет решений, если $D$ квадратичный невычет по модулю $p$.
 	
 	\section{Алгоритм}
 	Для решения сравнений второй степени необходимо решить следующее сравнение:\\
-	$y^2\equiv D(modp)$, к которому сводится изначальное сраванение.\\
+	$y^2\equiv D\bmod p$, к которому сводится изначальное сраванение.\\
 	Для решения этого сравнения я использую алгоритм Тонелли — Шенкса.
 	\newpage
 	\begin{algorithm}[ph]
 		\caption{Алгоритм Тонелли — Шенкса}
 		\label{alg:AlgName}
 		\textbf{Входные данные:} $p$ - нечётное простое число, $a$ - целое число, являющееся квадратичным вычетом по модулю $p$\\
-		\textbf{Выходные данные:} Вычет $R$, удовлетворяющий сравнению $R^2\equiv n(modp)$
+		\textbf{Выходные данные:} Вычет $R$, удовлетворяющий сравнению $R^2\equiv n\bmod p$
 		\begin{algorithmic}
-			\State 1. Вычислить $a^{(p-1)/2}(modp)$. Результат должен быть равен 1 или -1 по малой теореме Ферма.
-			\State 2. Если $a^{(p-1)/2}(modp) \equiv -1$ корней нет. Выход из алгоритма.
-			\State 3. Если $a^{(p-1)/2}(modp) \equiv 1$ представить: $p-1=s*2^e$,где $s$ и $e$ положительны.
+			\State 1. Вычислить $a^{(p-1)/2}\bmod p$. Результат должен быть равен 1 или -1 по малой теореме Ферма.
+			\State 2. Если $a^{(p-1)/2}\bmod p \equiv -1$ корней нет. Выход из алгоритма.
+			\State 3. Если $a^{(p-1)/2}\bmod p \equiv 1$ представить: $p-1=s\cdot 2^e$,где $s$ и $e$ положительны.
 			\State 4. Найти число $n$, которое будет являться квадратным невычетом по модулю $p$
 			\State 5. \textit{(Инициализация)}.\\ 
-			\ \ \ $x\equiv a^{(s+1)/2}(modp)$ (Первое предположение о корне)\\
-			\ \ \ $b\equiv a^s(modp)$ (Первое предположение о погрешности)\\
-			\ \ \ $g\equiv n^s(modp)$ (Степень $g$ будет обновлять $x$ и $b$)\\
-		    \ \ \ $r\equiv e(modp)$ ($e$ будет расти с каждым шагом алгоритма)
-			\State 6. Имеем: $b^{2^{r-1}}=a^{s*2^{r-1}}=a^{(p-1)/2}\equiv 1(modp)$. Тогда существует такое наименьшее целое число $m$, что $0\le m\le r-1$ и $b^{2^m}\equiv1(modp)$
+			\ \ \ $x\equiv a^{(s+1)/2}\bmod p$ (Первое предположение о корне)\\
+			\ \ \ $b\equiv a^s\bmod p$ (Первое предположение о погрешности)\\
+			\ \ \ $g\equiv n^s\bmod p$ (Степень $g$ будет обновлять $x$ и $b$)\\
+		    \ \ \ $r\equiv e\bmod p$ ($e$ будет расти с каждым шагом алгоритма)
+			\State 6. Имеем: $b^{2^{r-1}}=a^{s\cdot 2^{r-1}}=a^{(p-1)/2}\equiv 1\bmod p$. Тогда существует такое наименьшее целое число $m$, что $0\le m\le r-1$ и $b^{2^m}\equiv1\bmod p$
 			\ \ \ Найти $m$ путем последовательных возведений в квадрат и сокращений по модулю $p$. Таким образом найдётся m такой, что $ord_p(b)=2^m$.
 			\State 7. Если $m=0$, Вывести x.
 			\State 8. Если $m>0$ изменяются следующие переменные: \\
-			\ \ \ $x\equiv x*g^{2^{r-m-1}}(modp)$ \\
-			\ \ \ $b\equiv b*g^{2^{r-m}}(modp)$ \\
-			\ \ \ $g\equiv g^{2^{r-m}}(modp)$ \\
-			\ \ \ $r\equiv m(modp)$
+			\ \ \ $x\equiv x\cdot g^{2^{r-m-1}}\bmod p$ \\
+			\ \ \ $b\equiv b\cdot g^{2^{r-m}}\bmod p$ \\
+			\ \ \ $g\equiv g^{2^{r-m}}\bmod p$ \\
+			\ \ \ $r\equiv m\bmod p$
 			\State 9. Вернитесь к шагу 6 с новыми значениями.
 		\end{algorithmic}
 	\end{algorithm}
@@ -145,13 +145,11 @@
 		
 		Тесты я проводил в онлайн компеляторе CoCalc. Исходя из результатов тестирования можно сделать вывод, что алгоритм sage для решения сравнений второй степени работает быстрее при небольших значениях коэффициентов и кольца, однако, он уступает моему алгоритму при достаточно больших числах.
 		
-		\paragraph{Bibliography.}
-		\begin{itemize}
-			\item Львовский С.М. - Набор и верстка в системе LATEX. 5-е изд. 2014.
-			\item Wikipedia: Wikipedia, The Free Encyclopedia [online], http://www.wikipedia.org
-			\item Square Roots from 1; 24, 51, 10 to Dan Shanks by Ezra Brown
-			\item Zimmermann P., Casamayou A., Cohen N. et al. - Computational Mathematics with SageMath. 2018
-			\item А.А.Илларионов - Теория чисел: Учебное пособие, 2016. 
-		\end{itemize}
-		
-	\end{document}
+\begin{thebibliography}{5}		
+			\bibitem{Lvovskiy} Львовский С.М. - Набор и верстка в системе LATEX. 5-е изд. 2014
+			\bibitem{Wiki}	Wikipedia: Tonelli–Shanks algorithm, https://en.wikipedia.org/wiki/Tonelli-Shanks/algorithm, 15 April 2020
+			\bibitem {Ezra Brown} Square Roots from 1; 24, 51, 10 to Dan Shanks by Ezra Brown
+			\bibitem{Zimmermann} Zimmermann P., Casamayou A., Cohen N. et al. - Computational Mathematics with SageMath. 2018
+			\bibitem {A.A.Illarionov} А.А.Илларионов - Теория чисел: Учебное пособие, 2016
+\end{thebibliography}
+\end{document}
